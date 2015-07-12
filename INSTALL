@@ -1,5 +1,0 @@
-!#/usr/bin/sh
-apt-get install python-pip
-pip install pyscreenshot
-apt-get install python-imaging
-pip install pyscreenshot

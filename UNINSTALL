@@ -1,4 +1,0 @@
-!#/usr/bin/sh
-#RUN THIS AS ROOT
-pip uninstall pyscreenshot
-#TODO remove gifmaker app

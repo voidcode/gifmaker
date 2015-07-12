@@ -2,27 +2,34 @@
 from gi.repository import Gtk, Gdk
 import os, time
 from random import randint
-global gifMakerRoot
-
 class Settings:
 	global filename, folderPath
 	def __init__(self):
 		self.filename = "settings.conf"
 		self.folderPath =  os.getenv("HOME") + "/.gifmaker/"
 		if not os.path.exists(self.folderPath):
-			os.makefile()
+			os.mkdir(self.folderPath)
+		if not os.path.exists(self.folderPath+self.filename):
+			try:
+				f = open(self.folderPath+self.filename, "w")
+				f.write(os.getenv("HOME") + '/Pictures/')
+				f.close()
+			except os.error:
+				pass
 	def get(self):
 		f = open(self.folderPath+self.filename)
-		return f.read()
+		fdata = f.read()
+		f.close()
+		return fdata
 	def set(self, newData):
 		f = open(self.folderPath+self.filename, "w")
 		f.write(newData)
-
+		f.close()
 class EventHandler:
 	global builder, approot, sw, settings, lb, comboboxtextDelay, labelSaveFolderPath
 	def __init__(self, builder):
-		self.settings = Settings()
 		self.builder = builder
+		self.settings = Settings()
 		self.sw = self.builder.get_object('sw')
 		self.lb = Gtk.ListBox()
 		self.sw.add(self.lb)
@@ -33,16 +40,28 @@ class EventHandler:
 		self.labelSaveFolderPath.set_text(self.settings.get())
 		self.fillImagesIntoSw()
 		print "EventHanlder() init END"
+	def onOpenAbortDialog(self, *widget):
+		print "onOpenAbortDialog is clicked!"
+		aboutdialog = Gtk.AboutDialog()
+		aboutdialog.set_name("GifMaker")
+		aboutdialog.set_version("0.1")
+		aboutdialog.set_comments("This app make it easy to create .gif images.")
+		aboutdialog.set_website("https://github.com/voidcode/gifmaker")
+		aboutdialog.set_website_label("Get the code")
+		aboutdialog.set_authors(["Terkel Sorensen"])
+		#abortDialog.set_license_type("gpl-3-0")
+		#abortDialog.set_logo(os.path.dirname(os.path.abspath(__file__)) + "/images/logo48.svg")
+		aboutdialog.run()
+		aboutdialog.destroy()
 	def onConvertToGif(self, *widgets):
+		print "Convert to gif is clciked"
 		folderpath = self.labelSaveFolderPath.get_text()
 		gifFilename = str(time.time())+'.gif'
 		delay = str(self.comboboxtextDelay.get_active() + 1)
-		print folderpath+'*.png'
-		print '-delay set to: '+ delay
 		os.chdir(folderpath)
+		print 'convert -delay '+delay+'x1 -loop 0 *.png '+gifFilename
 		os.system('convert -delay '+delay+'x1 -loop 0 *.png '+gifFilename)
 		os.system('xdg-open '+folderpath+gifFilename)
-		print "Convert to gif is clciked"
 		print folderpath
 	def onAddNewImage(self, *widgets):
 		if self.gifMakerRoot=="":
@@ -80,10 +99,9 @@ class EventHandler:
 		fcd.destroy()
 
 	def fillImagesIntoSw(self, *args):
-		filesInGifMakerRoot = os.listdir(self.gifMakerRoot)
-		self.labelSaveFolderPath.set_text(self.gifMakerRoot)
+		filesInGifMakerRoot = os.listdir(self.settings.get())
+		self.labelSaveFolderPath.set_text(self.settings.get())
 		if len(filesInGifMakerRoot) > 0:
-			print os.listdir(self.gifMakerRoot) 
 			for filename in reversed(filesInGifMakerRoot):
 				fn, ext = os.path.splitext(filename)
 				if ext == '.png':
@@ -94,13 +112,13 @@ class EventHandler:
 					lbr.add(fimg)
 					self.lb.insert(lbr, 0)
 				else:
-					print 'This app only support the .png format... '+filename+' is not added to sw!'
+					print 'This app only support the .png format... '+filename+' is not added to listbox!'
 			self.sw.show_all()
 		else:
 			self.sw.show_all()
-			print "This folder has no files in this folder"
+			print "This folder has no files in it!"
 	def onQuit(self, *widget):
-		print "quit is clicked"
+		print "Quit this app is clicked!"
 		Gtk.main_quit()
 
 class GifMakerWindow:
@@ -118,7 +136,7 @@ class GifMakerWindow:
 		self.window = self.builder.get_object('mainWindow')
 		self.window.override_background_color(0, self.bgColor)
 		self.window.set_title('GifMaker')
-		self.window.set_position(Gtk.WindowPosition.MOUSE)
+		#self.window.set_position(Gtk.WindowPosition.CENTER)
 
 		self.window.show_all()
 	def main(self):
