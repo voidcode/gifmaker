@@ -4,34 +4,33 @@ import os, time
 from random import randint
 global gifMakerRoot
 
-class Settings:
-	global filename, folderPath
+class settings:
 	def __init__(self):
-		self.filename = "settings.conf"
-		self.folderPath =  os.getenv("HOME") + "/.gifmaker/"
-		if not os.path.exists(self.folderPath):
+		print "setting init---"
+		self.filePath =  os.getenv("HOME") + "/settings.conf"
+		if not os.path.exists(self.filePath):
 			os.makefile()
-	def get(self):
-		f = open(self.folderPath+self.filename)
+	def get():
+		f = open(self.filePath)
 		return f.read()
-	def set(self, newData):
-		f = open(self.folderPath+self.filename, "w")
+	def set(newData):
+		f = open(self.filePath, "+w")
 		f.write(newData)
 
 class EventHandler:
-	global builder, approot, sw, settings, lb, comboboxtextDelay, labelSaveFolderPath
+	global builder
+	global approot
+	global sw
+	global lb, comboboxtextDelay, labelSaveFolderPath
 	def __init__(self, builder):
-		self.settings = Settings()
 		self.builder = builder
 		self.sw = self.builder.get_object('sw')
 		self.lb = Gtk.ListBox()
 		self.sw.add(self.lb)
 		self.sw.show_all()
-		self.gifMakerRoot = self.settings.get()
+		self.gifMakerRoot = None
 		self.comboboxtextDelay = self.builder.get_object('comboboxtextDelay')
 		self.labelSaveFolderPath = self.builder.get_object('labelSaveFolderPath')
-		self.labelSaveFolderPath.set_text(self.settings.get())
-		self.fillImagesIntoSw()
 		print "EventHanlder() init END"
 	def onConvertToGif(self, *widgets):
 		folderpath = self.labelSaveFolderPath.get_text()
@@ -45,11 +44,11 @@ class EventHandler:
 		print "Convert to gif is clciked"
 		print folderpath
 	def onAddNewImage(self, *widgets):
-		if self.gifMakerRoot=="":
+		if self.gifMakerRoot is None:
 			self.onChooseImagefolderClicked()
 		else:
 			savepath = self.gifMakerRoot + str(time.time())+'.png'
-			os.system('gnome-screenshot -a -f '+ savepath)
+			os.system('gnome-screenshot -a -file='+ savepath)
 			print 'gnome-screenshot -a -file="' + savepath + '"'
 			fimg = Gtk.Image()
 			fimg.set_from_file(savepath)
@@ -60,22 +59,20 @@ class EventHandler:
 			print "Adding new image to sw: (savepath) == " + savepath
 	def onChooseImagefolderClicked(self, *widgets):
 		print "Choose image folder is clicked!"
-		fcd = Gtk.FileChooserDialog("Please choose a folder", None, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Use this folder", Gtk.ResponseType.OK))
-		if self.settings.get() == "":
-			fcd.set_current_folder(os.getenv('HOME') + '/Pictures/')
-		else:
-			fcd.set_current_folder(self.settings.get())
+		fcd = Gtk.FileChooserDialog("Please choose a folder", None, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select", Gtk.ResponseType.OK))
+		fcd.set_current_folder(os.getenv('HOME') + '/Pictures/')
 		#fcd.connect('current-folder-changed', self.onChooseFolderSelectedChanged)
 		fcd.show_all()
 
 		response = fcd.run()
 		if response == Gtk.ResponseType.OK:
+			print "OK"
 			#print "gifMakerRoot: " +gifMakerRoot
 			print "Changes folder selected to: " + fcd.get_filename()
 			self.gifMakerRoot = fcd.get_filename() + "/"
-			self.settings.set(self.gifMakerRoot)
 			self.fillImagesIntoSw()
 		elif response == Gtk.ResponseType.CANCEL:
+			print "CANCEL: hide FileChooserDialog!"
 			fcd.hide()
 		fcd.destroy()
 
