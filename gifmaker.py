@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from gi.repository import Gtk, Gdk, GdkPixbuf
-import os, time
+from PIL import Image
+import os, time, shutil
 class Settings:
 	global filename, folderPath
 	def __init__(self):
@@ -57,10 +58,11 @@ class EventHandler:
 		folderpath = self.labelSaveFolderPath.get_text()
 		gifFilename = str(time.time())+'.gif'
 		delay = str(self.comboboxtextDelay.get_active() + 1)
-		os.chdir(folderpath)
+		self.resizeAllImageInFolder(folderpath)
+		os.chdir(folderpath+"thumbails/")
 		print 'convert -delay '+delay+'x1 -loop 0 *.png '+gifFilename
 		os.system('convert -delay '+delay+'x1 -loop 0 *.png '+gifFilename)
-		os.system('xdg-open '+folderpath+gifFilename)
+		os.system('xdg-open '+folderpath+"thumbails/"+gifFilename)
 		print folderpath
 	def onAddNewImage(self, *widgets):
 		if self.gifMakerRoot=="":
@@ -78,6 +80,24 @@ class EventHandler:
 			self.lb.insert(lbr, 0)
 			self.sw.show_all()
 			print "Adding new image to sw: (savepath) == " + savepath
+	def resizeAllImageInFolder(self, pathToFolder):
+		print "resizeAllImageInFolder is running..." +pathToFolder
+		thumbailFolder = pathToFolder+"thumbails/"		
+		if not os.path.exists(thumbailFolder):
+			os.mkdir(thumbailFolder)
+		else:
+			allFilesInThumbailFolder = os.listdir(thumbailFolder)
+			for filename in allFilesInThumbailFolder:
+				os.remove(thumbailFolder+filename)	
+		allImages = os.listdir(pathToFolder)
+		for filename in allImages:
+			fn, ext = os.path.splitext(filename)
+			if ext == ".png":
+				img = Image.open(pathToFolder+filename)
+				img.thumbnail((500, 500), Image.ANTIALIAS)
+				img.save(thumbailFolder+filename)
+	def onOpenCurrentImagefolderClicked(self, *widget):
+		os.system("gnome-open "+self.settings.get())
 	def onChooseImagefolderClicked(self, *widgets):
 		print "Choose image folder is clicked!"
 		fcd = Gtk.FileChooserDialog("Please choose a folder", None, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Use this folder", Gtk.ResponseType.OK))
@@ -137,14 +157,14 @@ class GifMakerWindow:
 	global sw
 	def __init__(self):
 		self.approot = os.path.dirname(os.path.abspath(__file__))
-		self.bgColor = Gdk.RGBA.from_color(Gdk.color_parse('#272822'))
+		#self.bgColor = Gdk.RGBA.from_color(Gdk.color_parse('#272822'))
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(self.approot + '/ui/main.glade')
 		self.builder.connect_signals(EventHandler(self.builder))
 
 		self.window = self.builder.get_object('mainWindow')
-		self.window.override_background_color(0, self.bgColor)
+		#self.window.override_background_color(0, self.bgColor)
 		self.window.set_title('GifMaker')
 		#self.window.set_position(Gtk.WindowPosition.CENTER)
 
