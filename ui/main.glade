@@ -39,18 +39,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkImageMenuItem" id="imagemenuitem_openimagefolder">
-                        <property name="label">View imagefolder</property>
-                        <property name="name">imagemenuitem_openimagefolder</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="image">image3</property>
-                        <property name="use_stock">False</property>
-                        <property name="always_show_image">True</property>
-                        <signal name="activate" handler="onOpenCurrentImagefolderClicked" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkImageMenuItem" id="imagemenuitem_chooseimagefolder">
                         <property name="label">Select imagefolder</property>
                         <property name="name">imagemenuitem_chooseimagefolder</property>
@@ -60,6 +48,18 @@
                         <property name="use_stock">False</property>
                         <property name="always_show_image">True</property>
                         <signal name="activate" handler="onChooseImagefolderClicked" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="imagemenuitem_openimagefolder">
+                        <property name="label">View imagefolder</property>
+                        <property name="name">imagemenuitem_openimagefolder</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">image3</property>
+                        <property name="use_stock">False</property>
+                        <property name="always_show_image">True</property>
+                        <signal name="activate" handler="onOpenCurrentImagefolderClicked" swapped="no"/>
                       </object>
                     </child>
                     <child>
