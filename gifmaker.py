@@ -60,9 +60,11 @@ class EventHandler:
 		delay = str(self.comboboxtextDelay.get_active() + 1)
 		self.resizeAllImageInFolder(folderpath)
 		os.chdir(folderpath+"thumbails/")
-		print 'convert -delay '+delay+'x1 -loop 0 *.png '+gifFilename
-		os.system('convert -delay '+delay+'x1 -loop 0 *.png '+gifFilename)
-		os.system('xdg-open '+folderpath+"thumbails/"+gifFilename)
+		if not os.path.exists(folderpath+"gifs/"):
+			os.mkdir(folderpath+"gifs/")
+		print 'convert -delay '+delay+'x1 -loop 0 *.png ../gifs/'+gifFilename
+		os.system('convert -delay '+delay+'x1 -loop 0 *.png ../gifs/'+gifFilename)
+		os.system('xdg-open '+folderpath+"gifs/"+gifFilename)
 		print folderpath
 	def onAddNewImage(self, *widgets):
 		if self.gifMakerRoot=="":
@@ -93,8 +95,8 @@ class EventHandler:
 		for filename in allImages:
 			fn, ext = os.path.splitext(filename)
 			if ext == ".png":
-				img = Image.open(pathToFolder+filename)
-				img.thumbnail((500, 500), Image.ANTIALIAS)
+				img = Image.open(pathToFolder+filename).resize( (500,500) )
+				#img.thumbnail((300, 300), Image.ANTIALIAS)
 				img.save(thumbailFolder+filename)
 	def onOpenCurrentImagefolderClicked(self, *widget):
 		os.system("gnome-open "+self.settings.get())
