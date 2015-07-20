@@ -166,6 +166,7 @@ class GifMakerWindow:
 		self.builder.connect_signals(EventHandler(self.builder))
 
 		self.window = self.builder.get_object('mainWindow')
+		self.window.set_icon_from_file(self.approot+'/images/logo48.png')
 		#self.window.override_background_color(0, self.bgColor)
 		self.window.set_title('GifMaker')
 		#self.window.set_position(Gtk.WindowPosition.CENTER)
