@@ -2,8 +2,8 @@
 Version=0.0.1
 Name=GifMaker
 Comment=Chapters screenshots then convert then into one .gif animation with this app. 
-Exec=python /usr/bin/gifmaker/gifmaker.py
-Icon=/usr/bin/gifmaker/images/logo48.svg
+Exec=python /usr/share/gifmaker/gifmaker.py
+Icon=/usr/share/gifmaker/images/logo48.png
 Terminal=false
 Type=Application
 Categories=Utility;Application;
