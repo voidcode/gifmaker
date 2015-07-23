@@ -2,11 +2,11 @@
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from PIL import Image
 import os, time, shutil
-class Settings:
+class StartupDir:
 	global filename, folderPath
 	def __init__(self):
-		self.filename = "settings.conf"
-		self.folderPath =  os.getenv("HOME") + "/.gifmaker/"
+		self.filename = "startup-dir.txt"
+		self.folderPath =  os.getenv("HOME") + "/.cache/.gifmaker/"
 		if not os.path.exists(self.folderPath):
 			os.mkdir(self.folderPath)
 		if not os.path.exists(self.folderPath+self.filename):
@@ -26,18 +26,18 @@ class Settings:
 		f.write(newData)
 		f.close()
 class EventHandler:
-	global builder, approot, sw, settings, lb, comboboxtextDelay, labelSaveFolderPath
+	global builder, approot, sw, startupDir, lb, comboboxtextDelay, labelSaveFolderPath
 	def __init__(self, builder):
 		self.builder = builder
-		self.settings = Settings()
+		self.startupDir = StartupDir()
 		self.sw = self.builder.get_object('sw')
 		self.lb = Gtk.ListBox()
 		self.sw.add(self.lb)
 		self.sw.show_all()
-		self.gifMakerRoot = self.settings.get()
+		self.gifMakerRoot = self.startupDir.get()
 		self.comboboxtextDelay = self.builder.get_object('comboboxtextDelay')
 		self.labelSaveFolderPath = self.builder.get_object('labelSaveFolderPath')
-		self.labelSaveFolderPath.set_text(self.settings.get())
+		self.labelSaveFolderPath.set_text(self.startupDir.get())
 		self.fillImagesIntoSw()
 		print "EventHanlder() init END"
 	def onOpenAbortDialog(self, *widget):
@@ -99,14 +99,14 @@ class EventHandler:
 				#img.thumbnail((300, 300), Image.ANTIALIAS)
 				img.save(thumbailFolder+filename)
 	def onOpenCurrentImagefolderClicked(self, *widget):
-		os.system("gnome-open "+self.settings.get())
+		os.system("gnome-open "+self.startupDir.get())
 	def onChooseImagefolderClicked(self, *widgets):
 		print "Choose image folder is clicked!"
 		fcd = Gtk.FileChooserDialog("Please choose a folder", None, Gtk.FileChooserAction.SELECT_FOLDER, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Use this folder", Gtk.ResponseType.OK))
-		if self.settings.get() == "":
+		if self.startupDir.get() == "":
 			fcd.set_current_folder(os.getenv('HOME') + '/Pictures/')
 		else:
-			fcd.set_current_folder(self.settings.get())
+			fcd.set_current_folder(self.startupDir.get())
 		fcd.connect('current-folder-changed', self.onChooseFolderSelectedChanged)
 		fcd.show_all()
 
@@ -115,7 +115,7 @@ class EventHandler:
 			#print "gifMakerRoot: " +gifMakerRoot
 			print "Changes folder selected to: " + fcd.get_filename()
 			self.gifMakerRoot = fcd.get_filename() + "/"
-			self.settings.set(self.gifMakerRoot)
+			self.startupDir.set(self.gifMakerRoot)
 			self.removeAllImagesInSw()		
 			self.fillImagesIntoSw()
 		elif response == Gtk.ResponseType.CANCEL:
@@ -129,23 +129,24 @@ class EventHandler:
 			self.lb.remove(self.lb.get_row_at_index(i))
 			i+1
 	def fillImagesIntoSw(self, *args):
-		pathToFolder = self.settings.get()
-		filesInGifMakerRoot = os.listdir(pathToFolder)
-		self.labelSaveFolderPath.set_text(pathToFolder)
-		if len(filesInGifMakerRoot) > 0:
-			for filename in reversed(filesInGifMakerRoot):
-				fn, ext = os.path.splitext(filename)
-				if ext == '.png':
-					print filename + '\n'
-					fimg = Gtk.Image()
-					fimg.set_from_file(self.gifMakerRoot + filename)
-					pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.gifMakerRoot + filename, width=230, height=230, preserve_aspect_ratio=False)
-					fimg.set_from_pixbuf(pixbuf)
-					lbr = Gtk.ListBoxRow()
-					lbr.add(fimg)
-					self.lb.insert(lbr, 0)
-				else:
-					print 'This app only support the .png format... '+filename+' is not added to listbox!'
+		pathToFolder = self.startupDir.get()
+		if os.path.exists(pathToFolder):
+			filesInGifMakerRoot = os.listdir(pathToFolder)
+			self.labelSaveFolderPath.set_text(pathToFolder)
+			if len(filesInGifMakerRoot) > 0:
+				for filename in reversed(filesInGifMakerRoot):
+					fn, ext = os.path.splitext(filename)
+					if ext == '.png':
+						print filename + '\n'
+						fimg = Gtk.Image()
+						fimg.set_from_file(self.gifMakerRoot + filename)
+						pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(self.gifMakerRoot + filename, width=230, height=230, preserve_aspect_ratio=False)
+						fimg.set_from_pixbuf(pixbuf)
+						lbr = Gtk.ListBoxRow()
+						lbr.add(fimg)
+						self.lb.insert(lbr, 0)
+					else:
+						print 'This app only support the .png format... '+filename+' is not added to listbox!'
 		self.sw.show_all()
 	def onChooseFolderSelectedChanged(self, *widget):
 		print "onChooseFolderSelectedChanged is clicked"

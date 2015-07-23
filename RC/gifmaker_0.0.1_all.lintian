@@ -1,0 +1,26 @@
+E: gifmaker: copyright-file-contains-full-gpl-license
+E: gifmaker: copyright-should-refer-to-common-license-file-for-gpl
+E: gifmaker: extended-description-is-empty
+W: gifmaker: non-standard-dir-perm opt/ 0775 != 0755
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/
+W: gifmaker: non-standard-dir-perm opt/gifmaker/ 0775 != 0755
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/gifmaker.py
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/images/
+W: gifmaker: non-standard-dir-perm opt/gifmaker/images/ 0775 != 0755
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/images/add149.png
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/images/add149.svg
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/images/logo48.png
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/images/logo512.png
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/ui/
+W: gifmaker: non-standard-dir-perm opt/gifmaker/ui/ 0775 != 0755
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/ui/abort.glade
+E: gifmaker: dir-or-file-in-opt opt/gifmaker/ui/main.glade
+W: gifmaker: non-standard-dir-perm usr/ 0775 != 0755
+W: gifmaker: non-standard-dir-perm usr/share/ 0775 != 0755
+W: gifmaker: non-standard-dir-perm usr/share/applications/ 0775 != 0755
+W: gifmaker: non-standard-dir-perm usr/share/doc/ 0775 != 0755
+W: gifmaker: non-standard-dir-perm usr/share/doc/gifmaker/ 0775 != 0755
+W: gifmaker: non-standard-file-perm usr/share/doc/gifmaker/changelog.gz 0664 != 0644
+W: gifmaker: non-standard-file-perm usr/share/doc/gifmaker/copyright 0664 != 0644
+W: gifmaker: desktop-command-not-in-package usr/share/applications/gifmaker.desktop python
+W: gifmaker: script-not-executable opt/gifmaker/gifmaker.py
